@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  mock-ocsp:
+    image: sootrasmus/mock-ocsp
+    command: "mock_ocspresponder.wsgi --processes 1 --threads 1"
+    volumes:
+      - ./certs:/app/certs
+      - ./conf:/app/conf
+    ports:
+    - "0.0.0.0:8080:80"

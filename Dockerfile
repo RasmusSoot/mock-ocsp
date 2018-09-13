@@ -10,4 +10,4 @@ RUN mod_wsgi-docker-build
 
 EXPOSE 80
 ENTRYPOINT [ "mod_wsgi-docker-start" ]
-CMD [ "mock-ocspresponder.wsgi" ]
+CMD [ "mock_ocspresponder.wsgi" ]
