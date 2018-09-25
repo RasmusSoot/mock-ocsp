@@ -1,6 +1,7 @@
 # Mock OCSP responder
 
 Mock OCSP responder based on [ocspresponder](https://pypi.org/project/ocspresponder/)
+
 Only major change is the use of ResponderId 'by_name', instead of 'by_key'
 
 Run `docker-compose up -d` to start the responder and 
@@ -22,6 +23,7 @@ Generate new OCSP responder certificate with:
 
 ## Modify response
 All requests and responses are logged, available at /log/ endpoint
+
 It is possible to modify responses by doing a HTTP POST request /set_status/<certificate serial> with JSON where:
 
 | **Name**        | **Description** |
@@ -35,6 +37,7 @@ It is possible to modify responses by doing a HTTP POST request /set_status/<cer
 | **include_nonce** | Controls if nonce is included in response, Boolean, defaults to true |
 
 ###Examples
+
 Good, but 30 seconds old:
 ````
 POST /set_status/141811770701420873040773020899829622874 HTTP/1.1
