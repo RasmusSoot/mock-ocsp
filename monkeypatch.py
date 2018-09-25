@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 
+import base64
 import inspect
-import logging
 import re
 import textwrap
 from datetime import datetime, timedelta
@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from asn1crypto import x509, keys, core, ocsp
 from asn1crypto.util import timezone
 from oscrypto import asymmetric
+
+import mock_responses
 
 
 def build(self, responder_private_key=None, responder_certificate=None):
@@ -88,9 +90,21 @@ def build(self, responder_private_key=None, responder_certificate=None):
     for name, value in self._response_data_extensions.items():
         response_data_extensions.append(_make_extension(name, value))
     if self._nonce:
-        response_data_extensions.append(
-            _make_extension('nonce', self._nonce)
-        )
+        nonce = self._nonce
+        try:
+            if mock_responses.responses[self._certificate.serial_number]['nonce']:
+                nonce = base64.b64decode(mock_responses.responses[self._certificate.serial_number]['nonce'])
+        except KeyError:
+            pass
+        try:
+            if mock_responses.responses[self._certificate.serial_number]['include_nonce']:
+                response_data_extensions.append(
+                    _make_extension('nonce', nonce)
+                )
+        except KeyError:
+            response_data_extensions.append(
+                _make_extension('nonce', nonce)
+            )
 
     if not response_data_extensions:
         response_data_extensions = None
@@ -146,13 +160,17 @@ def build(self, responder_private_key=None, responder_certificate=None):
             '''
         ))
 
-    produced_at = datetime.now(timezone.utc)
+    produced_at = datetime.now(timezone.utc) + timedelta(
+        seconds=mock_responses.responses.get(self._certificate.serial_number, {}).get('produced_at', 0))
 
     if self._this_update is None:
-        self._this_update = produced_at
+        self._this_update = produced_at + timedelta(
+        seconds=mock_responses.responses.get(self._certificate.serial_number, {}).get('this_update', 0))
 
     if self._next_update is None:
-        self._next_update = self._this_update + timedelta(days=7)
+        self._next_update = self._this_update + timedelta(
+            seconds=mock_responses.responses.get(self._certificate.serial_number, {}).get('next_update', 60 * 15))
+
     name = x509.Name.build({"common_name": responder_certificate.subject.native['common_name']})
     str(
         name)  # TODO: this is mandatory, or asn1crypto.core.Sequence.__setitem__ considers it invalid @ "invalid_value = new_value.chosen.contents is None"
@@ -261,11 +279,3 @@ def _type_name(value):
     if cls.__module__ in set(['builtins', '__builtin__']):
         return cls.__name__
     return '%s.%s' % (cls.__module__, cls.__name__)
-
-
-logger = logging.getLogger(__name__)
-
-
-def serve(self, port=8080, debug=False):
-    logger.info('Launching %sserver on port %d', 'debug' if debug else '', port)
-    self._app.run(host='0.0.0.0', port=port, debug=debug)
