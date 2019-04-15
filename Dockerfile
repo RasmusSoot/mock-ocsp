@@ -6,6 +6,8 @@ COPY mock_ocspresponder.py /app
 COPY monkeypatch.py /app
 COPY mock_ocspresponder.wsgi /app
 COPY requirements.txt /app
+COPY mock_responses.py /app
+
 RUN mod_wsgi-docker-build
 
 EXPOSE 80

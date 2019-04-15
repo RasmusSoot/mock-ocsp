@@ -19,7 +19,7 @@ See `docker-compose.yml` file on how to add mod_wsgi parameters and run
 `docker-compose exec mock-ocsp mod_wsgi-express start-server --help` for a list of possible configuration values
 
 Generate new OCSP responder certificate with:    
-`openssl req -x509 -newkey rsa:2048 -keyout conf/key.pem -out conf/cert.pem -days 3650 -nodes -subj '/CN=MOCK-OCSP'`
+`openssl req -x509 -newkey rsa:2048 -keyout conf/key.pem -out conf/cert.pem -days 3650 -nodes -subj '/CN=MOCK OCSP' -config conf/openssl.conf`
 
 ## Modify response
 All requests and responses are logged, available at /log/ endpoint

@@ -19,12 +19,12 @@ OCSP_KEY = 'conf/key.pem'
 request_response_log = {}
 
 
-class ConfiguraleOcspResponder(OCSPResponder):
+class ConfigurableOcspResponder(OCSPResponder):
 
     def _route(self):
         self._app.get('/', callback=self._handle_root)
         self._app.get('/status/<request_data>', callback=self._handle_get)
-        self._app.post('/status/', callback=self._handle_post)
+        self._app.post('/status', callback=self._handle_post)
         self._app.get('/log/', callback=self._handle_log)
         self._app.post('/set_status/<serialnumber>', callback=self._set_status)
 
@@ -87,7 +87,7 @@ def get_cert(serial: int) -> str:
         return f.read().strip()
 
 
-app = ConfiguraleOcspResponder(
+app = ConfigurableOcspResponder(
     ISSUER_CERT, OCSP_CERT, OCSP_KEY,
     validate_func=validate,
     cert_retrieve_func=get_cert,
