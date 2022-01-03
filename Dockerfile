@@ -1,4 +1,5 @@
-FROM grahamdumpleton/mod-wsgi-docker:python-3.5
+ARG DOCKERHUB_MIRROR=
+FROM ${DOCKERHUB_MIRROR}grahamdumpleton/mod-wsgi-docker:python-3.5
 
 WORKDIR /app
 
